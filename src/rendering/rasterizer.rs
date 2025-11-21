@@ -1256,8 +1256,10 @@ impl Rasterizer {
         let fb_width = target.width() as f32;
         let fb_height = target.full_height() as f32;
         let (rect_x0, rect_y0, rect_w, rect_h) = target.rect();
-        let rect_x1 = rect_x0 + rect_w - 1;
-        let rect_y1 = rect_y0 + rect_h - 1;
+        // Use spatial boundaries (exclusive upper bounds) not pixel indices
+        // This prevents gaps between slices when rendering in parallel
+        let rect_x_limit = (rect_x0 + rect_w) as f32;
+        let rect_y_limit = (rect_y0 + rect_h) as f32;
 
         let tex_id = block_type.texture_id();
         let texture = unsafe { self.atlas.textures.get_unchecked(tex_id) };
@@ -1293,9 +1295,9 @@ impl Rasterizer {
             let mut min_y = verts_screen[0].y.min(verts_screen[1].y).min(verts_screen[2].y);
             let mut max_y = verts_screen[0].y.max(verts_screen[1].y).max(verts_screen[2].y);
 
-            // Clamp to target rectangle
+            // Clamp to target rectangle (using spatial boundaries)
             min_y = min_y.max(rect_y0 as f32);
-            max_y = max_y.min(rect_y1 as f32);
+            max_y = max_y.min(rect_y_limit);
 
             if min_y > max_y {
                 continue;
@@ -1346,8 +1348,8 @@ impl Rasterizer {
             let y_end = max_y.ceil() as i32;
 
             for y in y_start..=y_end {
-                // Respect target rectangle
-                if y < rect_y0 as i32 || y > rect_y1 as i32 {
+                // Respect target rectangle (using exclusive upper bound)
+                if y < rect_y0 as i32 || y >= rect_y_limit as i32 {
                     continue;
                 }
 
@@ -1396,10 +1398,14 @@ impl Rasterizer {
                 }
 
                 let x_start_f = points[0].x.max(rect_x0 as f32);
-                let x_end_f = points[1].x.min(rect_x1 as f32);
+                let x_end_f = points[1].x.min(rect_x_limit);
 
-                let x_start = x_start_f.ceil() as i32;
-                let x_end = x_end_f.floor() as i32;
+                // Adjust for pixel centers (x + 0.5).
+                // We want pixels where the pixel center is inside [x_start_f, x_end_f].
+                // x + 0.5 >= x_start_f  =>  x >= x_start_f - 0.5
+                // x + 0.5 <= x_end_f    =>  x <= x_end_f - 0.5
+                let x_start = (x_start_f - 0.5).ceil() as i32;
+                let x_end = (x_end_f - 0.5).floor() as i32;
 
                 if x_start > x_end {
                     continue;
