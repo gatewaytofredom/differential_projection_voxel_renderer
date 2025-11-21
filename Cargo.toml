@@ -1,0 +1,68 @@
+[package]
+name = "voxel_engine"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Window and input handling
+winit = "0.29"
+# Software rendering
+softbuffer = "0.4"
+# Linear algebra
+glam = "0.25"
+# Noise generation for terrain
+noise = "0.9"
+# Performance measurement
+criterion = "0.5"
+# Profiling with hardware performance counters
+perf-event = { version = "0.4", optional = true }
+# Thread-local storage for profiling
+thread_local = { version = "1.1", optional = true }
+# Parallel iteration for multi-core rendering
+rayon = "1.8"
+# High-performance allocator (reduces fragmentation, better than system malloc)
+mimalloc = { version = "0.1", default-features = false }
+
+[dev-dependencies]
+criterion = "0.5"
+lazy_static = "1.4"
+rand = "0.8"
+rand_chacha = "0.3"
+
+[features]
+default = []
+# Enable instrumentation and profiling counters
+profiling = ["perf-event", "thread_local"]
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[profile.bench]
+inherits = "release"
+
+[[bench]]
+name = "meshing"
+harness = false
+
+[[bench]]
+name = "rendering"
+harness = false
+
+[[bench]]
+name = "world"
+harness = false
+
+[[bench]]
+name = "microbench"
+harness = false
+
+[[bench]]
+name = "differential_projection"
+harness = false
+
+[[bench]]
+name = "span_walker"
+harness = false

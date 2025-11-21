@@ -1,0 +1,60 @@
+# Rust build artifacts
+/target/
+**/*.rs.bk
+*.pdb
+
+# Cargo lock file (included for binary projects)
+# Cargo.lock is tracked for reproducible builds
+
+# Debug and release builds
+debug/
+release/
+
+# Rust profiling and benchmarking
+*.profdata
+*.profraw
+perf.data
+perf.data.old
+flamegraph.svg
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Performance analysis files
+cachegrind.out.*
+callgrind.out.*
+massif.out.*
+
+# Temporary files
+*.tmp
+*.log
+*.bak
+
+# Compiled dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Test coverage
+*.gcda
+*.gcno
+*.gcov
+tarpaulin-report.html
+cobertura.xml
+
+# Benchmark results
+/benches/target/
+
+# OS-specific files
+Thumbs.db
+
+# Personal notes and working documents
+rust_project_collated.txt
+
+# Cargo build cache
+.cargo/
