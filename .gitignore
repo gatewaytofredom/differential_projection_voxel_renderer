@@ -58,3 +58,6 @@ rust_project_collated.txt
 
 # Cargo build cache
 .cargo/
+
+# Reference material (external git repository)
+reference_material/binary_greedy_mesher_demo/
