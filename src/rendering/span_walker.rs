@@ -135,6 +135,12 @@ impl SpanWalkerRasterizer {
         let vp_width = self.viewport_width as f32;
         let vp_height = self.viewport_height as f32;
 
+        // FIX: Add a small epsilon to close sub-pixel gaps between adjacent quads.
+        // Without this, floating point errors can cause the end of one quad to be
+        // slightly less than the start of the next (e.g., 100.4999 vs 100.5001),
+        // causing pixel centers at 100.5 to be skipped.
+        const EPSILON: f32 = 0.001;
+
         for i in 0..(projected.count as usize) {
             // Check visibility mask
             if (projected.visibility_mask & (1 << i)) == 0 {
@@ -144,8 +150,10 @@ impl SpanWalkerRasterizer {
             // Convert NDC to screen space
             let screen_x_min = ((projected.screen_x_min[i] + 1.0) * 0.5 * vp_width).max(0.0);
             let screen_y_min = ((1.0 - projected.screen_y_max[i]) * 0.5 * vp_height).max(0.0);
-            let screen_x_max = ((projected.screen_x_max[i] + 1.0) * 0.5 * vp_width).min(vp_width);
-            let screen_y_max = ((1.0 - projected.screen_y_min[i]) * 0.5 * vp_height).min(vp_height);
+
+            // Apply epsilon to max bounds
+            let screen_x_max = ((projected.screen_x_max[i] + 1.0) * 0.5 * vp_width + EPSILON).min(vp_width);
+            let screen_y_max = ((1.0 - projected.screen_y_min[i]) * 0.5 * vp_height + EPSILON).min(vp_height);
 
             // Skip if completely outside viewport
             if screen_x_min >= vp_width
