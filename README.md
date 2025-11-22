@@ -210,41 +210,6 @@ No Internal Docs: Do not reference internal documents, Slack threads, or offline
 
 No Marketing Speak: Avoid fluff like "Huge performance win," "Refactor for better readability," or "Modernize." Just state the facts.
 
-Examples
-Bad (Project Manager Style)
-code
-Text
-download
-content_copy
-expand_less
-Add AVX2 register state retention optimization to span walker
-
-Implementation notes:
-- Phase 1 of the vertical loop overhaul
-- Loads batch state into YMM registers
-- Key improvement: Zero memory bandwidth
-
-Jira: PROJ-123
-
-Critique: Title is too long. Mentions "Phase 1." Uses bullet points. Uses marketing speak ("Key improvement").
-
-Good (Systems Style)
-code
-Text
-download
-content_copy
-expand_less
-avx/raster: cache trapezoid state in YMM regs for span walk
-
-Profiling indicated that the span walker was bottlenecked by L1 cache
-latency when reloading TrapezoidBatch state during the scanline loop.
-
-This change hosts the entire SoA batch in 8 YMM registers upon entry.
-Vertical updates now utilize vaddps directly on registers, reducing
-the loop dependency chain to a single cycle and eliminating the
-memory round-trip.
-
-Critique: Concise subject with scope. Body is a technical narrative explaining the hardware bottleneck and the solution. No external references.
 
 ## License
 
