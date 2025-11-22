@@ -41,7 +41,6 @@ Optimized for **Intel i5-12400** (6 cores, AVX2, 48KB L1 / 1.25MB L2 / 18MB L3):
 - **4 cores**: 3.7-3.9x speedup (92-98% efficiency)
 - **8 cores**: 7.0-7.5x speedup (88-94% efficiency)
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed implementation notes and optimization history.
 
 ## Controls
 
@@ -93,12 +92,6 @@ perf stat -d cargo bench
 perf stat -e cache-misses,cache-references cargo bench --bench rendering
 ```
 
-See [BENCHMARKING.md](BENCHMARKING.md) for the complete profiling guide including:
-- Cache miss analysis
-- Branch prediction metrics
-- IPC (instructions per cycle) analysis
-- Hardware counter integration
-
 ## Key Optimizations
 
 This engine demonstrates several advanced optimization techniques:
@@ -130,7 +123,6 @@ This engine demonstrates several advanced optimization techniques:
 - **Mesh Caching**: Immutable chunks reuse previously generated meshes
 - **Direct Array Access**: Branchless neighbor checks (eliminates ~7,000 branches/chunk)
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for complete implementation details.
 
 ## Testing
 
@@ -253,13 +245,6 @@ the loop dependency chain to a single cycle and eliminating the
 memory round-trip.
 
 Critique: Concise subject with scope. Body is a technical narrative explaining the hardware bottleneck and the solution. No external references.
-
-## References
-
-- [Binary Greedy Meshing](https://github.com/cgerikj/binary-greedy-meshing) - Core meshing algorithm
-- [Rust Optimization Guide](reference_material/Rust%20Optimization.md) - Performance best practices
-- [BENCHMARKING.md](BENCHMARKING.md) - Complete profiling guide
-- [ARCHITECTURE.md](ARCHITECTURE.md) - Implementation details and design decisions
 
 ## License
 
