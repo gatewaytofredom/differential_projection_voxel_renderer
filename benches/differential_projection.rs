@@ -37,9 +37,9 @@ fn bench_full_mvp_multiply(c: &mut Criterion) {
     c.bench_function("full_mvp_per_vertex", |b| {
         b.iter(|| {
             let mut total = 0;
-            for (face_idx, packets) in face_packets.faces.iter().enumerate() {
+            for (_face_idx, packets) in face_packets.faces.iter().enumerate() {
                 for packet in packets {
-                    for i in 0..(packet.len as usize) {
+                    for _i in 0..(packet.len as usize) {
                         // Simulate full MVP multiply for 4 vertices per quad
                         for _ in 0..4 {
                             let _ = black_box(view_proj);
@@ -67,9 +67,9 @@ fn bench_differential_projection_scalar(c: &mut Criterion) {
 
     c.bench_function("differential_projection_scalar", |b| {
         b.iter(|| {
-            let mut total = 0;
-            for (face_idx, packets) in face_packets.faces.iter().enumerate() {
-                let face_dir = match face_idx {
+            let mut checksum = 0.0f32;
+            for (_face_idx, packets) in face_packets.faces.iter().enumerate() {
+                let face_dir = match _face_idx {
                     0 => FaceDir::PosX,
                     1 => FaceDir::NegX,
                     2 => FaceDir::PosY,
@@ -92,14 +92,21 @@ fn bench_differential_projection_scalar(c: &mut Criterion) {
                         &view_proj,
                     );
 
+                    // Project all quads in packet
                     let mut projected = ProjectedPacket::new();
                     for i in 0..(packet.len as usize) {
                         basis.project_single_scalar(packet, &mut projected, i);
-                        total += 1;
+                    }
+
+                    // Read results to prevent DCE (separate from projection)
+                    for i in 0..(packet.len as usize) {
+                        checksum += projected.screen_x_min[i];
+                        checksum += projected.screen_y_min[i];
+                        checksum += projected.depth_near[i];
                     }
                 }
             }
-            black_box(total)
+            black_box(checksum)
         });
     });
 }
@@ -124,9 +131,9 @@ fn bench_differential_projection_simd(c: &mut Criterion) {
 
     c.bench_function("differential_projection_simd", |b| {
         b.iter(|| {
-            let mut total = 0;
-            for (face_idx, packets) in face_packets.faces.iter().enumerate() {
-                let face_dir = match face_idx {
+            let mut checksum = 0.0f32;
+            for (_face_idx, packets) in face_packets.faces.iter().enumerate() {
+                let face_dir = match _face_idx {
                     0 => FaceDir::PosX,
                     1 => FaceDir::NegX,
                     2 => FaceDir::PosY,
@@ -149,14 +156,21 @@ fn bench_differential_projection_simd(c: &mut Criterion) {
                         &view_proj,
                     );
 
+                    // Project packet using SIMD
                     let mut projected = ProjectedPacket::new();
                     unsafe {
                         basis.project_packet_bounds_simd(packet, &mut projected);
                     }
-                    total += packet.len as usize;
+
+                    // Read results to prevent DCE
+                    for i in 0..(packet.len as usize) {
+                        checksum += projected.screen_x_min[i];
+                        checksum += projected.screen_y_min[i];
+                        checksum += projected.depth_near[i];
+                    }
                 }
             }
-            black_box(total)
+            black_box(checksum)
         });
     });
 }
