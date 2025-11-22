@@ -56,6 +56,12 @@ Thumbs.db
 # Personal notes and working documents
 rust_project_collated.txt
 
+# Documentation and helper files (keep only README.md)
+ARCHITECTURE.md
+BENCHMARKING.md
+GITHUB_UPLOAD_INSTRUCTIONS.md
+docs/
+
 # Cargo build cache
 .cargo/
 
