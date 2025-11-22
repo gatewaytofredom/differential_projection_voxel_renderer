@@ -29,10 +29,11 @@ A high-performance voxel rendering engine built in Rust, implementing a fully so
 Optimized for **Intel i5-12400** (6 cores, AVX2, 48KB L1 / 1.25MB L2 / 18MB L3):
 
 ### Frame Times (1280x720, view distance 12)
-- **60 FPS** (16.67ms target): Easily achieved
+- **162-168 FPS** achieved (6.0-6.2ms per frame, target was 120 FPS)
 - **Chunk Meshing**: <1ms per 32³ chunk (cached: 0ms)
-- **Rasterization**: 5-15ms (70-90% of frame time, parallelized 6-8x)
+- **Rasterization**: 3-5ms (parallelized 6-8x across cores)
 - **Culling**: ~0.3ms (frustum + horizon)
+- **Active Chunks**: ~7,150 chunks managed, ~250 visible meshes rendered
 - **Memory Usage**: ~15MB peak (8MB framebuffer + chunk data)
 
 ### Scalability
@@ -173,6 +174,85 @@ benches/                 # Criterion benchmarks
 tests/                   # Integration tests
 reference_material/      # Binary greedy meshing reference implementation
 ```
+## Guidelines
+
+Commit Message Guidelines
+
+We maintain a high standard for our git history. The commit log is treated as permanent technical documentation. When you are debugging a regression five years from now, the commit message should explain why a change was made without requiring access to external issue trackers or outdated project roadmaps.
+
+1. Structure
+
+We follow the "50/72" rule strictly:
+
+Subject: Max 50 characters.
+
+Blank line: Between subject and body.
+
+Body: Wrap text at 72 characters.
+
+2. The Subject Line
+
+Format: scope: imperative summary of the change
+
+Imperative Mood: Write as a command (e.g., "Fix," "Add," "Change"), not a past-tense description ("Fixed," "Added," "Changed").
+
+Scope: Identify the subsystem being modified (e.g., avx, raster, docs, build).
+
+No Punctuation: Do not end the subject with a period.
+
+3. The Body
+
+Narrative over Lists: Do not use bullet points or headers (like "Key improvements" or "Implementation notes"). Write in full, explanatory paragraphs.
+
+Focus on "Why": The code shows how it works. The commit message must explain why the change was necessary. Explain the bottleneck, the bug, or the architectural decision.
+
+Hardware/Technical Context: If optimizing, mention the specific hardware constraint (e.g., "Reduces L1 cache pressure," "Avoids branch misprediction").
+
+4. What to Avoid (Strict)
+
+Our code history is decoupled from our project management.
+
+No Roadmap References: Do not mention "Phase 1," "Sprint 4," or "MVP."
+
+No Internal Docs: Do not reference internal documents, Slack threads, or offline discussions. The commit must stand on its own.
+
+No Marketing Speak: Avoid fluff like "Huge performance win," "Refactor for better readability," or "Modernize." Just state the facts.
+
+Examples
+❌ Bad (Project Manager Style)
+code
+Text
+download
+content_copy
+expand_less
+Add AVX2 register state retention optimization to span walker
+
+Implementation notes:
+- Phase 1 of the vertical loop overhaul
+- Loads batch state into YMM registers
+- Key improvement: Zero memory bandwidth
+
+Jira: PROJ-123
+
+Critique: Title is too long. Mentions "Phase 1." Uses bullet points. Uses marketing speak ("Key improvement").
+
+✅ Good (Systems Style)
+code
+Text
+download
+content_copy
+expand_less
+avx/raster: cache trapezoid state in YMM regs for span walk
+
+Profiling indicated that the span walker was bottlenecked by L1 cache
+latency when reloading TrapezoidBatch state during the scanline loop.
+
+This change hosts the entire SoA batch in 8 YMM registers upon entry.
+Vertical updates now utilize vaddps directly on registers, reducing
+the loop dependency chain to a single cycle and eliminating the
+memory round-trip.
+
+Critique: Concise subject with scope. Body is a technical narrative explaining the hardware bottleneck and the solution. No external references.
 
 ## References
 

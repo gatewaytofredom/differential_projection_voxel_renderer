@@ -1314,30 +1314,31 @@ impl Rasterizer {
                 inv_w: f32,
             }
 
+            // FIX: Use original clip space W for perspective correction coefficients
             let verts_span = [
                 SpanVertex {
                     x: verts_screen[0].x,
                     y: verts_screen[0].y,
                     z: verts_ndc[0].z,
-                    u_over_w: tri[0].uv.x / verts_ndc[0].w,
-                    v_over_w: tri[0].uv.y / verts_ndc[0].w,
-                    inv_w: 1.0 / verts_ndc[0].w,
+                    u_over_w: tri[0].uv.x / tri[0].clip_pos.w,
+                    v_over_w: tri[0].uv.y / tri[0].clip_pos.w,
+                    inv_w: 1.0 / tri[0].clip_pos.w,
                 },
                 SpanVertex {
                     x: verts_screen[1].x,
                     y: verts_screen[1].y,
                     z: verts_ndc[1].z,
-                    u_over_w: tri[1].uv.x / verts_ndc[1].w,
-                    v_over_w: tri[1].uv.y / verts_ndc[1].w,
-                    inv_w: 1.0 / verts_ndc[1].w,
+                    u_over_w: tri[1].uv.x / tri[1].clip_pos.w,
+                    v_over_w: tri[1].uv.y / tri[1].clip_pos.w,
+                    inv_w: 1.0 / tri[1].clip_pos.w,
                 },
                 SpanVertex {
                     x: verts_screen[2].x,
                     y: verts_screen[2].y,
                     z: verts_ndc[2].z,
-                    u_over_w: tri[2].uv.x / verts_ndc[2].w,
-                    v_over_w: tri[2].uv.y / verts_ndc[2].w,
-                    inv_w: 1.0 / verts_ndc[2].w,
+                    u_over_w: tri[2].uv.x / tri[2].clip_pos.w,
+                    v_over_w: tri[2].uv.y / tri[2].clip_pos.w,
+                    inv_w: 1.0 / tri[2].clip_pos.w,
                 },
             ];
 
