@@ -219,7 +219,7 @@ No Internal Docs: Do not reference internal documents, Slack threads, or offline
 No Marketing Speak: Avoid fluff like "Huge performance win," "Refactor for better readability," or "Modernize." Just state the facts.
 
 Examples
-❌ Bad (Project Manager Style)
+Bad (Project Manager Style)
 code
 Text
 download
@@ -236,7 +236,7 @@ Jira: PROJ-123
 
 Critique: Title is too long. Mentions "Phase 1." Uses bullet points. Uses marketing speak ("Key improvement").
 
-✅ Good (Systems Style)
+Good (Systems Style)
 code
 Text
 download
