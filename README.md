@@ -41,7 +41,6 @@ Optimized for **Intel i5-12400** (6 cores, AVX2, 48KB L1 / 1.25MB L2 / 18MB L3):
 - **4 cores**: 3.7-3.9x speedup (92-98% efficiency)
 - **8 cores**: 7.0-7.5x speedup (88-94% efficiency)
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed implementation notes and optimization history.
 
 ## Controls
 
@@ -93,12 +92,6 @@ perf stat -d cargo bench
 perf stat -e cache-misses,cache-references cargo bench --bench rendering
 ```
 
-See [BENCHMARKING.md](BENCHMARKING.md) for the complete profiling guide including:
-- Cache miss analysis
-- Branch prediction metrics
-- IPC (instructions per cycle) analysis
-- Hardware counter integration
-
 ## Key Optimizations
 
 This engine demonstrates several advanced optimization techniques:
@@ -130,7 +123,6 @@ This engine demonstrates several advanced optimization techniques:
 - **Mesh Caching**: Immutable chunks reuse previously generated meshes
 - **Direct Array Access**: Branchless neighbor checks (eliminates ~7,000 branches/chunk)
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for complete implementation details.
 
 ## Testing
 
@@ -218,48 +210,6 @@ No Internal Docs: Do not reference internal documents, Slack threads, or offline
 
 No Marketing Speak: Avoid fluff like "Huge performance win," "Refactor for better readability," or "Modernize." Just state the facts.
 
-Examples
-❌ Bad (Project Manager Style)
-code
-Text
-download
-content_copy
-expand_less
-Add AVX2 register state retention optimization to span walker
-
-Implementation notes:
-- Phase 1 of the vertical loop overhaul
-- Loads batch state into YMM registers
-- Key improvement: Zero memory bandwidth
-
-Jira: PROJ-123
-
-Critique: Title is too long. Mentions "Phase 1." Uses bullet points. Uses marketing speak ("Key improvement").
-
-✅ Good (Systems Style)
-code
-Text
-download
-content_copy
-expand_less
-avx/raster: cache trapezoid state in YMM regs for span walk
-
-Profiling indicated that the span walker was bottlenecked by L1 cache
-latency when reloading TrapezoidBatch state during the scanline loop.
-
-This change hosts the entire SoA batch in 8 YMM registers upon entry.
-Vertical updates now utilize vaddps directly on registers, reducing
-the loop dependency chain to a single cycle and eliminating the
-memory round-trip.
-
-Critique: Concise subject with scope. Body is a technical narrative explaining the hardware bottleneck and the solution. No external references.
-
-## References
-
-- [Binary Greedy Meshing](https://github.com/cgerikj/binary-greedy-meshing) - Core meshing algorithm
-- [Rust Optimization Guide](reference_material/Rust%20Optimization.md) - Performance best practices
-- [BENCHMARKING.md](BENCHMARKING.md) - Complete profiling guide
-- [ARCHITECTURE.md](ARCHITECTURE.md) - Implementation details and design decisions
 
 ## License
 
