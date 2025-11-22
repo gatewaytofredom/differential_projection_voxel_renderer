@@ -14,6 +14,7 @@
 
 use glam::{Mat4, Vec3};
 use std::sync::Arc;
+use super::rasterizer::PixelTarget;
 
 /// Macrotile size in pixels (128×128 = 16,384 pixels)
 /// Memory footprint: 64KB depth + 64KB color = 128KB total (fits in 256KB L2 cache)
@@ -103,6 +104,12 @@ impl MacroTile {
     #[inline]
     pub fn write_color(&mut self, index: usize, color: u32) {
         self.color[index] = color;
+    }
+
+    /// Get the index for a pixel at (x, y) in tile-local coordinates
+    #[inline]
+    fn local_index(&self, local_x: usize, local_y: usize) -> usize {
+        local_y * self.width + local_x
     }
 
     /// Flush tile contents to the main framebuffer
@@ -285,6 +292,56 @@ impl ThreadLocalBins {
         for bin in &mut self.thread_bins {
             bin.clear();
         }
+    }
+}
+
+/// Implement PixelTarget trait for MacroTile to enable rasterization directly into tiles
+impl PixelTarget for MacroTile {
+    #[inline]
+    fn width(&self) -> usize {
+        self.fb_width
+    }
+
+    #[inline]
+    fn full_height(&self) -> usize {
+        self.fb_height
+    }
+
+    #[inline]
+    fn rect(&self) -> (usize, usize, usize, usize) {
+        (self.x0, self.y0, self.width, self.height)
+    }
+
+    #[inline]
+    unsafe fn test_depth_and_get_index(
+        &mut self,
+        x: usize,
+        y: usize,
+        depth: f32,
+    ) -> Option<usize> {
+        // Convert to tile-local coordinates
+        let local_x = x.wrapping_sub(self.x0);
+        let local_y = y.wrapping_sub(self.y0);
+
+        // Bounds check
+        if local_x >= self.width || local_y >= self.height {
+            return None;
+        }
+
+        let idx = self.local_index(local_x, local_y);
+
+        // Depth test
+        if depth < self.depth[idx] {
+            self.depth[idx] = depth;
+            Some(idx)
+        } else {
+            None
+        }
+    }
+
+    #[inline]
+    fn write_color(&mut self, index: usize, color: u32) {
+        self.color[index] = color;
     }
 }
 
