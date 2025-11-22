@@ -170,11 +170,11 @@ reference_material/      # Binary greedy meshing reference implementation
 
 Commit Message Guidelines
 
-We maintain a high standard for our git history. The commit log is treated as permanent technical documentation. When you are debugging a regression five years from now, the commit message should explain why a change was made without requiring access to external issue trackers or outdated project roadmaps.
+Maintain a high standard for our git history. The commit log is treated as permanent technical documentation. When you are debugging a regression a year from now, the commit message should explain why a change was made without requiring access to external issue trackers or outdated project roadmaps.
 
 1. Structure
 
-We follow the "50/72" rule strictly:
+Follow the "50/72" rule strictly:
 
 Subject: Max 50 characters.
 
@@ -199,16 +199,6 @@ Narrative over Lists: Do not use bullet points or headers (like "Key improvement
 Focus on "Why": The code shows how it works. The commit message must explain why the change was necessary. Explain the bottleneck, the bug, or the architectural decision.
 
 Hardware/Technical Context: If optimizing, mention the specific hardware constraint (e.g., "Reduces L1 cache pressure," "Avoids branch misprediction").
-
-4. What to Avoid (Strict)
-
-Our code history is decoupled from our project management.
-
-No Roadmap References: Do not mention "Phase 1," "Sprint 4," or "MVP."
-
-No Internal Docs: Do not reference internal documents, Slack threads, or offline discussions. The commit must stand on its own.
-
-No Marketing Speak: Avoid fluff like "Huge performance win," "Refactor for better readability," or "Modernize." Just state the facts.
 
 
 ## License
